@@ -1,0 +1,5 @@
+{
+  "name": "AI Bingo",
+  "description": "A fun bingo game where you generate a random card with common AI interactions and mark them off. The middle spot is a free space.",
+  "requestFramePermissions": []
+}
