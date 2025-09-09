@@ -9,70 +9,79 @@ interface BingoSquareProps {
 
 // Helper function to determine font and padding based on text length
 const getDynamicStyles = (textLength: number, hasName: boolean) => {
-    let paddingClass = 'p-1.5';
-    let fontClass = '';
+  // Base styles for the shortest text
+  let paddingClass = 'p-2';
+  let fontClass = 'text-sm sm:text-base';
+  let leadingClass = 'leading-snug';
 
-    if (hasName) {
-        // Less vertical space, text needs to be smaller
-        if (textLength > 80) {
-            fontClass = 'text-[9px] sm:text-[10px] opacity-70';
-            paddingClass = 'p-1';
-        } else if (textLength > 60) {
-            fontClass = 'text-[10px] sm:text-[11px] opacity-70';
-        } else {
-            fontClass = 'text-[11px] sm:text-xs opacity-70';
-        }
-    } else {
-        // More vertical space
-        if (textLength > 90) {
-            fontClass = 'text-[10px] sm:text-[11px]';
-            paddingClass = 'p-1';
-        } else if (textLength > 70) {
-            fontClass = 'text-[11px] sm:text-xs';
-        } else if (textLength > 40) {
-            fontClass = 'text-xs sm:text-sm';
-        } else {
-            // For very short text like "FREE"
-            fontClass = 'text-sm';
-        }
-    }
-    return { paddingClass, fontClass };
+  // Having a name below the main text reduces available vertical space,
+  // so we apply the "smaller text" styles sooner.
+  const verticalSpaceModifier = hasName ? 20 : 0;
+
+  if (textLength > 90 - verticalSpaceModifier) {
+    // Very long text -> smallest font, padding, and line height
+    fontClass = 'text-[10px] sm:text-[11px]';
+    paddingClass = 'p-1';
+    leadingClass = 'leading-tight';
+  } else if (textLength > 60 - verticalSpaceModifier) {
+    // Long text -> small font and padding
+    fontClass = 'text-[11px] sm:text-xs';
+    paddingClass = 'p-1.5';
+    leadingClass = 'leading-tight';
+  } else if (textLength > 30 - verticalSpaceModifier) {
+    // Medium text
+    fontClass = 'text-xs sm:text-sm';
+  }
+  
+  // If a name is present, make the main description slightly transparent
+  // to give prominence to the name.
+  if (hasName) {
+      fontClass += ' opacity-70';
+  }
+
+  return { paddingClass, fontClass, leadingClass };
 };
+
 
 const BingoSquare: React.FC<BingoSquareProps> = ({ text, name, isFreeSpace, onClick }) => {
   const isToggled = name !== null || isFreeSpace;
   const hasName = name && !isFreeSpace;
   
-  const { paddingClass, fontClass } = getDynamicStyles(text.length, hasName);
+  const { paddingClass, fontClass, leadingClass } = getDynamicStyles(text.length, hasName);
 
-  // The base classes now dynamically include padding
-  const baseClasses = `w-full h-full flex flex-col items-center justify-center ${paddingClass} text-center rounded-lg shadow-lg cursor-pointer transition-all duration-300 ease-in-out print:rounded-none print:shadow-none print:border print:border-black border-2 border-transparent`;
+  const cursorClass = isFreeSpace ? 'cursor-default' : 'cursor-pointer';
+  // Use a consistent border width to prevent layout shift on hover/toggle.
+  const baseClasses = `w-full h-full flex flex-col items-center justify-center ${paddingClass} text-center rounded-lg shadow-lg ${cursorClass} transition-all duration-300 ease-in-out print:rounded-none print:shadow-none print:border print:border-black border-4`;
   
   let stateClasses = '';
 
   if (isFreeSpace) {
-    stateClasses = 'bg-amber-500 text-black font-bold';
+    // Make the free space highly distinct with a brighter background, thick border, and glow.
+    stateClasses = 'bg-amber-400 text-black border-amber-200 shadow-lg shadow-amber-500/40';
   } else if (isToggled) {
     stateClasses = 'bg-purple-600 border-amber-500 text-amber-400 transform scale-105';
   } else {
-    stateClasses = 'bg-purple-900 text-gray-300 hover:bg-purple-800 hover:border-amber-500';
+    // Start with a transparent border to reserve space.
+    stateClasses = 'bg-purple-900 text-gray-300 border-transparent hover:bg-purple-800 hover:border-amber-500';
   }
   
   const printClasses = isToggled ? 'print:bg-gray-200' : 'print:bg-white';
 
-  // Override font size for the FREE space to make it prominent
-  const descriptionClasses = isFreeSpace ? 'text-lg' : fontClass;
+  // Override font style for the FREE space to make it large, bold, and unmissable.
+  const descriptionClasses = isFreeSpace 
+    ? 'text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-wider' 
+    : `${fontClass} ${leadingClass}`;
 
   return (
     <div
       onClick={onClick}
       className={`${baseClasses} ${stateClasses} ${printClasses} print:text-black print:transform-none`}
     >
-      <p className={`leading-tight break-words ${descriptionClasses}`}>
+      <p className={`break-words ${descriptionClasses}`}>
         {text}
       </p>
       {hasName && (
-        <p className="font-bold text-yellow-300 text-[10px] sm:text-[11px] mt-0.5 break-words">
+        <p className="font-bold text-yellow-300 text-[10px] sm:text-[11px] mt-1 break-words">
           {name}
         </p>
       )}
