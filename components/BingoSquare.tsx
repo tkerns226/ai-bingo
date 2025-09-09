@@ -10,7 +10,7 @@ interface BingoSquareProps {
 const BingoSquare: React.FC<BingoSquareProps> = ({ text, name, isFreeSpace, onClick }) => {
   const isToggled = name !== null || isFreeSpace;
 
-  const baseClasses = 'w-full h-full flex flex-col items-center justify-center p-2 text-center rounded-lg shadow-lg cursor-pointer transition-all duration-300 ease-in-out print:rounded-none print:shadow-none print:border print:border-black border-2 border-transparent';
+  const baseClasses = 'w-full h-full flex flex-col items-center justify-center p-1.5 text-center rounded-lg shadow-lg cursor-pointer transition-all duration-300 ease-in-out print:rounded-none print:shadow-none print:border print:border-black border-2 border-transparent';
   
   let stateClasses = '';
 
@@ -29,8 +29,8 @@ const BingoSquare: React.FC<BingoSquareProps> = ({ text, name, isFreeSpace, onCl
   const hasName = name && !isFreeSpace;
   
   const descriptionClasses = hasName
-    ? 'text-[0.55rem] sm:text-[11px] opacity-70' // Smaller text when name is shown
-    : 'text-[0.6rem] sm:text-xs lg:text-sm'; // Original size
+    ? 'text-[10px] sm:text-[11px] opacity-70' // Smaller text when name is shown
+    : 'text-[11px] sm:text-xs'; // Capped at text-xs to prevent overflow.
 
   return (
     <div
@@ -41,7 +41,7 @@ const BingoSquare: React.FC<BingoSquareProps> = ({ text, name, isFreeSpace, onCl
         {text}
       </p>
       {hasName && (
-        <p className="font-bold text-yellow-300 text-[11px] sm:text-xs mt-1 break-words">
+        <p className="font-bold text-yellow-300 text-[10px] sm:text-[11px] mt-0.5 break-words">
           {name}
         </p>
       )}
